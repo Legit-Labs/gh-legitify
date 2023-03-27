@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -e
+
+if ! type -p go >/dev/null; then
+  echo "Go not found on the system" >&2
+  exit 1
+fi
+
+if [ ! -d "./legitify" ]; then
+    echo "Initializing legitify..."
+    git clone --depth 1 https://github.com/Legit-Labs/legitify.git &>/dev/null
+fi
+
+cd legitify; LEGITIFY_TOKEN=$(gh auth token) go run ./... analyze --namespace repository; cd ..
