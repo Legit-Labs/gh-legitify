@@ -13,7 +13,8 @@ fi
 
 # Default values
 REPO_NAME=""
-SCORECARD="no"
+SCORECARD=""
+ORG_NAME=""
 
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
@@ -30,8 +31,13 @@ while [[ $# -gt 0 ]]; do
       shift
       shift
       ;;
+    --org)
+      ORG_NAME="$2"
+      shift
+      shift
+      ;;
     *)
-      echo "Unknown option: $key"
+      echo "Error: Unknown option: $key"
       exit 1
       ;;
   esac
@@ -42,7 +48,12 @@ PARAMS=""
 if [ -n "$REPO_NAME" ]; then
   PARAMS="$PARAMS --repo=$REPO_NAME"
 fi
-PARAMS="$PARAMS --scorecard=$SCORECARD"
+if [ -n "$SCORECARD" ]; then
+  PARAMS="$PARAMS --scorecard=$SCORECARD"
+fi
+if [ -n "$ORG_NAME" ]; then
+  PARAMS="$PARAMS --org=$ORG_NAME"
+fi
 
 # Run legitify with the provided parameters
 cd legitify; LEGITIFY_TOKEN=$(gh auth token) go run ./... analyze --namespace repository $PARAMS; cd ..
