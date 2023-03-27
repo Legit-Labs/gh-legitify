@@ -11,4 +11,38 @@ if [ ! -d "./legitify" ]; then
     git clone --depth 1 https://github.com/Legit-Labs/legitify.git &>/dev/null
 fi
 
-cd legitify; LEGITIFY_TOKEN=$(gh auth token) go run ./... analyze --namespace repository; cd ..
+# Default values
+REPO_NAME=""
+SCORECARD="no"
+
+# Parse command line arguments
+while [[ $# -gt 0 ]]; do
+  key="$1"
+
+  case $key in
+    --repo)
+      REPO_NAME="$2"
+      shift
+      shift
+      ;;
+    --scorecard)
+      SCORECARD="$2"
+      shift
+      shift
+      ;;
+    *)
+      echo "Unknown option: $key"
+      exit 1
+      ;;
+  esac
+done
+
+# Build parameter string
+PARAMS=""
+if [ -n "$REPO_NAME" ]; then
+  PARAMS="$PARAMS --repo=$REPO_NAME"
+fi
+PARAMS="$PARAMS --scorecard=$SCORECARD"
+
+# Run legitify with the provided parameters
+cd legitify; LEGITIFY_TOKEN=$(gh auth token) go run ./... analyze --namespace repository $PARAMS; cd ..
